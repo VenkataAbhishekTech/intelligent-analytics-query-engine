@@ -1,0 +1,161 @@
+[
+  {
+    "query": "Total sales in India for March",
+    "generated_logic": "SELECT SUM(quantity * unit_price * (1 - discount)) AS revenue\nFROM sales_data\nWHERE country = 'India' AND strftime(order_date, '%Y-%m') = '2024-03'\n;",
+    "result": [
+      {
+        "revenue": 108.0
+      }
+    ],
+    "confidence_score": 0.9,
+    "explanation": "The system understood the query as calculating revenue, with the requested filters. The system converted the query plan into executable SQL and executed it using DuckDB. The query returned 1 result row(s)."
+  },
+  {
+    "query": "Top 2 cities by profit",
+    "generated_logic": "SELECT city, SUM(profit) AS profit\nFROM sales_data\nGROUP BY city\nORDER BY profit DESC\nLIMIT 2\n;",
+    "result": [
+      {
+        "city": "New York",
+        "profit": 200.0
+      },
+      {
+        "city": "San Francisco",
+        "profit": 180.0
+      }
+    ],
+    "confidence_score": 0.85,
+    "explanation": "The system understood the query as calculating profit, grouped by city, limited to the top 2 results. The system converted the query plan into executable SQL and executed it using DuckDB. The query returned 2 result row(s)."
+  },
+  {
+    "query": "Average order value by region",
+    "generated_logic": "SELECT region, SUM(quantity * unit_price * (1 - discount)) / NULLIF(COUNT(order_id), 0) AS avg_order_value\nFROM sales_data\nGROUP BY region\n;",
+    "result": [
+      {
+        "region": "APAC",
+        "avg_order_value": 118.5
+      },
+      {
+        "region": "NA",
+        "avg_order_value": 1087.4666666666667
+      },
+      {
+        "region": "EMEA",
+        "avg_order_value": 799.3333333333334
+      }
+    ],
+    "confidence_score": 0.95,
+    "explanation": "The system understood the query as calculating avg_order_value, grouped by region. The system converted the query plan into executable SQL and executed it using DuckDB. The query returned 3 result row(s)."
+  },
+  {
+    "query": "Which region missed its target in Feb?",
+    "generated_logic": "SELECT\n    s.region,\n    s.revenue,\n    t.target_revenue,\n    s.revenue - t.target_revenue AS difference,\n    CASE\n        WHEN s.revenue <\n             t.target_revenue\n        THEN 'Missed'\n        ELSE 'Met'\n    END AS target_status\n\nFROM\n(\n    SELECT\n        region,\n        SUM(\n            quantity * unit_price * (1 - discount)\n        ) AS revenue\n\n    FROM sales_data\n\n    WHERE strftime(\n        order_date,\n        '%Y-%m'\n    ) = '2024-02'\n\n    GROUP BY region\n\n) s\n\nJOIN targets t\n    ON s.region = t.region\n    AND t.month = '2024-02'\n\nWHERE s.revenue <\n      t.target_revenue\n\nORDER BY difference ASC;",
+    "result": [
+      {
+        "region": "NA",
+        "revenue": 1116.0,
+        "target_revenue": 9500,
+        "difference": -8384.0,
+        "target_status": "Missed"
+      },
+      {
+        "region": "EMEA",
+        "revenue": 255.0,
+        "target_revenue": 7500,
+        "difference": -7245.0,
+        "target_status": "Missed"
+      },
+      {
+        "region": "APAC",
+        "revenue": 75.0,
+        "target_revenue": 6000,
+        "difference": -5925.0,
+        "target_status": "Missed"
+      }
+    ],
+    "confidence_score": 1.0,
+    "explanation": "The system understood the query as calculating revenue, grouped by region, comparing actual revenue against target revenue. The system calculated actual revenue from the sales data, joined it with the target data, and compared actual revenue with the corresponding target. The query returned 3 result row(s)."
+  },
+  {
+    "query": "Sales contribution % by category",
+    "generated_logic": "SELECT\n    product_category,\n    SUM(quantity * unit_price * (1 - discount)) AS revenue,\n    ROUND(\n        100.0 * SUM(quantity * unit_price * (1 - discount))\n        / NULLIF(\n            SUM(\n                SUM(quantity * unit_price * (1 - discount))\n            ) OVER (),\n            0\n        ),\n        2\n    ) AS contribution_percentage\nFROM sales_data\n\nGROUP BY product_category\nORDER BY contribution_percentage DESC;",
+    "result": [
+      {
+        "product_category": "Technology",
+        "revenue": 5402.0,
+        "contribution_percentage": 88.06
+      },
+      {
+        "product_category": "Furniture",
+        "revenue": 579.0,
+        "contribution_percentage": 9.44
+      },
+      {
+        "product_category": "Office Supplies",
+        "revenue": 153.4,
+        "contribution_percentage": 2.5
+      }
+    ],
+    "confidence_score": 1.0,
+    "explanation": "The system understood the query as calculating revenue, grouped by product_category, with each group expressed as a percentage of the overall total. The system converted the query plan into executable SQL and executed it using DuckDB. The query returned 3 result row(s)."
+  },
+  {
+    "query": "Top product in each region",
+    "generated_logic": "WITH grouped_data AS (\n\n    SELECT\n        region, product_name,\n        SUM(quantity * unit_price * (1 - discount)) AS revenue\n\n    FROM sales_data\n\n\n    GROUP BY region, product_name\n\n),\n\nranked_data AS (\n\n    SELECT\n        *,\n        RANK() OVER (\n            PARTITION BY region\n            ORDER BY revenue DESC\n        ) AS rank\n\n    FROM grouped_data\n\n)\n\nSELECT *\nFROM ranked_data\nWHERE rank <= 1\nORDER BY rank;",
+    "result": [
+      {
+        "region": "APAC",
+        "product_name": "Ergo Chair",
+        "revenue": 324.0,
+        "rank": 1
+      },
+      {
+        "region": "NA",
+        "product_name": "Dell XPS",
+        "revenue": 2068.0,
+        "rank": 1
+      },
+      {
+        "region": "EMEA",
+        "product_name": "Samsung Galaxy",
+        "revenue": 1288.0,
+        "rank": 1
+      }
+    ],
+    "confidence_score": 1.0,
+    "explanation": "The system understood the query as calculating revenue, grouped by region, product_name, including ranking within the requested groups, limited to the top 1 results. The system used multiple analytical stages in SQL to calculate the intermediate values, apply the required ranking or filtering logic, and then produce the final result. The query returned 3 result row(s)."
+  },
+  {
+    "query": "YoY growth in revenue",
+    "generated_logic": "WITH yearly_revenue AS (\n\n    SELECT\n        EXTRACT(\n            YEAR FROM order_date\n        ) AS year,\n        SUM(\n            quantity * unit_price * (1 - discount)\n        ) AS revenue\n\n    FROM sales_data\n\n    GROUP BY\n        EXTRACT(\n            YEAR FROM order_date\n        )\n\n),\n\nyoy_data AS (\n\n    SELECT\n        year,\n        revenue,\n        LAG(revenue) OVER (\n            ORDER BY year\n        ) AS previous_year_revenue\n\n    FROM yearly_revenue\n\n)\n\nSELECT\n    year,\n    revenue,\n    previous_year_revenue,\n    ROUND(\n        100.0 *\n        (\n            revenue - previous_year_revenue\n        )\n        / NULLIF(\n            previous_year_revenue,\n            0\n        ),\n        2\n    ) AS yoy_growth_percentage\n\nFROM yoy_data\n\nORDER BY year;",
+    "result": [
+      {
+        "year": 2024,
+        "revenue": 6134.4,
+        "previous_year_revenue": NaN,
+        "yoy_growth_percentage": NaN
+      }
+    ],
+    "confidence_score": 0.95,
+    "explanation": "The system understood the query as calculating revenue. The system used multiple analytical stages in SQL to calculate the intermediate values, apply the required ranking or filtering logic, and then produce the final result. The query returned 1 result row(s)."
+  },
+  {
+    "query": "Revenue of top 3 customers per region",
+    "generated_logic": "WITH customer_revenue AS (\n\n    SELECT\n        region,\n        customer_id,\n        SUM(quantity * unit_price * (1 - discount)) AS revenue\n\n    FROM sales_data\n\n    GROUP BY\n        region,\n        customer_id\n\n),\n\nranked_customers AS (\n\n    SELECT\n        region,\n        customer_id,\n        revenue,\n        RANK() OVER (\n            PARTITION BY region\n            ORDER BY revenue DESC\n        ) AS customer_rank\n\n    FROM customer_revenue\n\n),\n\ntop_customers AS (\n\n    SELECT\n        region,\n        customer_id,\n        revenue,\n        customer_rank\n\n    FROM ranked_customers\n\n    WHERE customer_rank <= 3\n\n)\n\nSELECT\n    region,\n    SUM(revenue) AS revenue\n\nFROM top_customers\n\nGROUP BY region\n\nORDER BY revenue DESC;",
+    "result": [
+      {
+        "region": "NA",
+        "revenue": 3262.4
+      },
+      {
+        "region": "EMEA",
+        "revenue": 2398.0
+      },
+      {
+        "region": "APAC",
+        "revenue": 474.0
+      }
+    ],
+    "confidence_score": 1.0,
+    "explanation": "The system understood the query as calculating revenue, grouped by region, customer_id, including ranking within the requested groups, limited to the top 3 results. The system used multiple analytical stages in SQL to calculate the intermediate values, apply the required ranking or filtering logic, and then produce the final result. The query returned 3 result row(s)."
+  }
+]

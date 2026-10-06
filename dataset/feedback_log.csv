@@ -1,0 +1,37 @@
+timestamp,query,feedback,confidence_score,generated_logic
+2026-10-06T16:42:59.589125,Top 2 cities by profit,negative,0.95,"SELECT city, SUM(profit) AS profit
+FROM sales_data
+GROUP BY city
+ORDER BY profit DESC
+LIMIT 2
+;"
+2026-10-06T16:44:33.882887,Top 2 cities by profit,negative,0.95,"SELECT city, SUM(profit) AS profit
+FROM sales_data
+GROUP BY city
+ORDER BY profit DESC
+LIMIT 2
+;"
+2026-10-06T16:44:37.693021,Top 2 cities by profit,negative,0.95,"SELECT city, SUM(profit) AS profit
+FROM sales_data
+GROUP BY city
+ORDER BY profit DESC
+LIMIT 2
+;"
+2026-10-06T16:45:55.422298,Top 2 cities by profit,negative,0.95,"SELECT city, SUM(profit) AS profit
+FROM sales_data
+GROUP BY city
+ORDER BY profit DESC
+LIMIT 2
+;"
+2026-10-06T16:46:03.839389,Top 2 cities by profit,negative,0.95,"SELECT city, SUM(profit) AS profit
+FROM sales_data
+GROUP BY city
+ORDER BY profit DESC
+LIMIT 2
+;"
+2026-10-06T16:55:01.548928,Top 5 cities by profit,positive,0.85,"SELECT city, SUM(profit) AS profit
+FROM sales_data
+GROUP BY city
+ORDER BY profit DESC
+LIMIT 5
+;"
