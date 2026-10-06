@@ -103,6 +103,12 @@
     "generated_logic": "WITH grouped_data AS (\n\n    SELECT\n        region, product_name,\n        SUM(quantity * unit_price * (1 - discount)) AS revenue\n\n    FROM sales_data\n\n\n    GROUP BY region, product_name\n\n),\n\nranked_data AS (\n\n    SELECT\n        *,\n        RANK() OVER (\n            PARTITION BY region\n            ORDER BY revenue DESC\n        ) AS rank\n\n    FROM grouped_data\n\n)\n\nSELECT *\nFROM ranked_data\nWHERE rank <= 1\nORDER BY rank;",
     "result": [
       {
+        "region": "EMEA",
+        "product_name": "Samsung Galaxy",
+        "revenue": 1288.0,
+        "rank": 1
+      },
+      {
         "region": "APAC",
         "product_name": "Ergo Chair",
         "revenue": 324.0,
@@ -112,12 +118,6 @@
         "region": "NA",
         "product_name": "Dell XPS",
         "revenue": 2068.0,
-        "rank": 1
-      },
-      {
-        "region": "EMEA",
-        "product_name": "Samsung Galaxy",
-        "revenue": 1288.0,
         "rank": 1
       }
     ],
