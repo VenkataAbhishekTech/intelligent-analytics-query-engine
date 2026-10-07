@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Intelligent Analytics Query Engine
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/dashboard/style.css"
+    >
+
+</head>
+
+<body>
+
+    <div class="app">
+
+        <header class="topbar">
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    IA
+                </div>
+
+                <div>
+
+                    <h1>
+                        Intelligent Analytics
+                    </h1>
+
+                    <p>
+                        Natural Language Query Engine
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="status">
+
+                <span
+                    id="statusDot"
+                    class="status-dot"
+                ></span>
+
+                <span id="statusText">
+                    Checking engine...
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <main class="main-content">
+
+            <section class="hero">
+
+                <div class="hero-content">
+
+                    <span class="badge">
+                        AI-POWERED ANALYTICS
+                    </span>
+
+                    <h2>
+                        Ask your data
+                        <span>anything.</span>
+                    </h2>
+
+                    <p>
+                        Turn natural language questions into
+                        powerful analytics queries and get
+                        clear, explainable results instantly.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <section class="query-card">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <h3>
+                            Ask a question
+                        </h3>
+
+                        <p>
+                            Describe the analysis you want in
+                            natural language.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="query-box">
+
+                    <textarea
+                        id="queryInput"
+                        placeholder="Example: Top 2 cities by profit"
+                        rows="4"
+                    ></textarea>
+
+                    <div class="query-actions">
+
+                        <span class="keyboard-hint">
+                            Press Ctrl + Enter to run
+                        </span>
+
+                        <button
+                            id="runButton"
+                            class="run-button"
+                        >
+
+                            <span id="buttonText">
+                                Run Query
+                            </span>
+
+                            <span
+                                id="buttonLoader"
+                                class="button-loader hidden"
+                            ></span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="examples-section">
+
+                    <span class="examples-title">
+                        Try an example
+                    </span>
+
+                    <div
+                        id="exampleButtons"
+                        class="example-buttons"
+                    ></div>
+
+                </div>
+
+            </section>
+
+
+            <section
+                id="errorCard"
+                class="error-card hidden"
+            >
+
+                <div class="error-icon">
+                    !
+                </div>
+
+                <div>
+
+                    <h3>
+                        Query failed
+                    </h3>
+
+                    <p id="errorMessage"></p>
+
+                </div>
+
+            </section>
+
+
+            <section
+                id="resultsSection"
+                class="results-section hidden"
+            >
+
+                <div class="results-header">
+
+                    <div>
+
+                        <span class="result-label">
+                            QUERY RESULT
+                        </span>
+
+                        <h3 id="resultQuery">
+                            -
+                        </h3>
+
+                    </div>
+
+                    <div class="confidence-card">
+
+                        <div class="confidence-header">
+
+                            <span>
+                                Confidence
+                            </span>
+
+                            <strong id="confidenceValue">
+                                0%
+                            </strong>
+
+                        </div>
+
+                        <div class="confidence-bar">
+
+                            <div
+                                id="confidenceFill"
+                                class="confidence-fill"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="result-grid">
+
+                    <div class="result-card explanation-card">
+
+                        <div class="card-header">
+
+                            <div class="card-icon">
+                                AI
+                            </div>
+
+                            <div>
+
+                                <h4>
+                                    Explanation
+                                </h4>
+
+                                <p>
+                                    How the engine interpreted
+                                    your question
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <p
+                            id="explanation"
+                            class="explanation-text"
+                        ></p>
+
+                    </div>
+
+
+                    <div class="result-card logic-card">
+
+                        <div class="card-header">
+
+                            <div class="card-icon">
+                                SQL
+                            </div>
+
+                            <div>
+
+                                <h4>
+                                    Generated Logic
+                                </h4>
+
+                                <p>
+                                    SQL generated by the analytics
+                                    engine
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <pre
+                            id="generatedLogic"
+                            class="sql-code"
+                        ></pre>
+
+                    </div>
+
+                </div>
+
+
+                <div class="result-card table-card">
+
+                    <div class="card-header">
+
+                        <div class="card-icon">
+                            #
+                        </div>
+
+                        <div>
+
+                            <h4>
+                                Data Results
+                            </h4>
+
+                            <p>
+                                Query output from DuckDB
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="tableContainer"
+                        class="table-container"
+                    ></div>
+
+                </div>
+
+
+                <div class="new-query-container">
+
+                    <button
+                        id="newQueryButton"
+                        class="secondary-button"
+                    >
+                        Ask Another Question
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <section class="how-section">
+
+                <div class="section-title">
+
+                    <span class="badge">
+                        HOW IT WORKS
+                    </span>
+
+                    <h3>
+                        From question to insight
+                    </h3>
+
+                    <p>
+                        A complete analytics pipeline works behind
+                        the scenes.
+                    </p>
+
+                </div>
+
+
+                <div class="pipeline">
+
+                    <div class="pipeline-step">
+
+                        <div class="step-number">
+                            01
+                        </div>
+
+                        <h4>
+                            Ask
+                        </h4>
+
+                        <p>
+                            Enter your question using normal
+                            language.
+                        </p>
+
+                    </div>
+
+
+                    <div class="pipeline-line"></div>
+
+
+                    <div class="pipeline-step">
+
+                        <div class="step-number">
+                            02
+                        </div>
+
+                        <h4>
+                            Understand
+                        </h4>
+
+                        <p>
+                            The engine converts your question
+                            into a query plan.
+                        </p>
+
+                    </div>
+
+
+                    <div class="pipeline-line"></div>
+
+
+                    <div class="pipeline-step">
+
+                        <div class="step-number">
+                            03
+                        </div>
+
+                        <h4>
+                            Generate
+                        </h4>
+
+                        <p>
+                            SQL is generated and validated
+                            automatically.
+                        </p>
+
+                    </div>
+
+
+                    <div class="pipeline-line"></div>
+
+
+                    <div class="pipeline-step">
+
+                        <div class="step-number">
+                            04
+                        </div>
+
+                        <h4>
+                            Analyze
+                        </h4>
+
+                        <p>
+                            DuckDB executes the query and returns
+                            the result.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+        <footer>
+
+            <p>
+                Intelligent Analytics Query Engine
+            </p>
+
+            <span>
+                Built with Python · FastAPI · DuckDB · Gemini
+            </span>
+
+        </footer>
+
+    </div>
+
+
+    <script
+        src="/dashboard/app.js"
+    ></script>
+
+</body>
+
+</html>
